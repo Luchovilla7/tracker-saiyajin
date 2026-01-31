@@ -189,6 +189,99 @@
             color: #888;
         }
 
+        /* Login Screen Styles */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(0, 20, 0, 0.95);
+            border: 2px solid var(--dbz-orange);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 30px rgba(255, 144, 0, 0.2);
+            text-align: center;
+        }
+
+        .login-card h2 {
+            font-family: 'Bangers';
+            color: var(--dbz-orange);
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .login-input:focus {
+            border-color: var(--ssj-gold);
+            outline: none;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: var(--dbz-orange);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Bangers';
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-login:hover {
+            transform: scale(1.02);
+            background: #ffaa33;
+        }
+
+        #main-content {
+            display: none;
+            /* Oculto por defecto */
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #ff4444;
+            color: white;
+        }
+
         /* Scouter Analytics Styles */
         .scouter-section {
             width: 100%;
@@ -288,57 +381,74 @@
 
 <body>
 
-    <h1>SAIYAN TRACKER</h1>
-
-    <div class="level-text" id="phase-name">ESTADO: BASE</div>
-
-    <audio id="check-sound" src="audio/check-ssj.mp3" preload="auto"></audio>
-    <audio id="transform-sound" src="transform-sound.mp3" preload="auto"></audio>
-
-    <div class="goku-container" id="goku-box">
-        <div class="aura" id="aura"></div>
-        <img id="goku-img" src="img/goku-base.png" alt="Goku">
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>ENTRADA SAIYAN</h2>
+            <p style="color: #888; margin-bottom: 20px;">Acceso restringido a la Cámara del Tiempo</p>
+            <input type="email" id="login-email" class="login-input" placeholder="Tu Email de Supabase">
+            <input type="password" id="login-password" class="login-input" placeholder="Tu Contraseña">
+            <button class="btn-login" onclick="login()">ENTRAR A ENTRENAR</button>
+            <p id="login-error" style="color: #ff4444; margin-top: 20px; font-size: 0.9rem; display: none;"></p>
+        </div>
     </div>
 
-    <div class="ki-bar-container">
-        <div id="ki-fill"></div>
-    </div>
+    <div id="main-content">
+        <h1>SAIYAN TRACKER</h1>
 
-    <ul class="habit-list" id="habit-list">
-        <!-- Generado por JS -->
-    </ul>
+        <div class="level-text" id="phase-name">ESTADO: BASE</div>
 
-    <div class="scouter-section">
-        <div class="scouter-header">Análisis de Ki del Guerrero <span id="sync-status"
-                style="font-size: 0.8rem; float: right; color: #555;">(Cargando Ki...)</span></div>
+        <audio id="check-sound" src="audio/check-ssj.mp3" preload="auto"></audio>
+        <audio id="transform-sound" src="transform-sound.mp3" preload="auto"></audio>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-label">Rango Saiyan</span>
-                <div class="stat-value" id="saiyan-rank">Recluta</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Nivel de Poder Máx</span>
-                <div class="stat-value" id="max-power">0%</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Racha de Entrenamiento</span>
-                <div class="stat-value" id="streak-days">0 Días</div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-label">Total Zeniths (Completados)</span>
-                <div class="stat-value" id="total-completed">0</div>
-            </div>
+        <div class="goku-container" id="goku-box">
+            <div class="aura" id="aura"></div>
+            <img id="goku-img" src="img/goku-base.png" alt="Goku">
         </div>
 
-        <div class="charts-container">
-            <div class="chart-box">
-                <div class="chart-title">Progreso Semanal (Ki)</div>
-                <canvas id="weeklyChart"></canvas>
+        <div class="ki-bar-container">
+            <div id="ki-fill"></div>
+        </div>
+
+        <ul class="habit-list" id="habit-list">
+            <!-- Generado por JS -->
+        </ul>
+
+        <div class="scouter-section">
+            <div class="scouter-header">Análisis de Ki del Guerrero <span id="sync-status"
+                    style="font-size: 0.8rem; float: right; color: #555;">(Cargando Ki...)</span></div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Rango Saiyan</span>
+                    <div class="stat-value" id="saiyan-rank">Recluta</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Nivel de Poder Máx</span>
+                    <div class="stat-value" id="max-power">0%</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Racha de Entrenamiento</span>
+                    <div class="stat-value" id="streak-days">0 Días</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Total Zeniths (Completados)</span>
+                    <div class="stat-value" id="total-completed">0</div>
+                </div>
             </div>
-            <div class="chart-box">
-                <div class="chart-title">Consistencia Mensual</div>
-                <canvas id="monthlyChart"></canvas>
+
+            <div class="charts-container">
+                <div class="chart-box">
+                    <div class="chart-title">Progreso Semanal (Ki)</div>
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title">Consistencia Mensual</div>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="logout-btn" onclick="logout()">Abandonar Entrenamiento (Cerrar Sesión)</button>
             </div>
         </div>
     </div>
@@ -347,10 +457,10 @@
         // Configuración de Supabase
         const SUPABASE_URL = 'https://vwbeqvvjwevnocepkllb.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3YmVxdnZqd2V2bm9jZXBrbGxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4ODg1ODMsImV4cCI6MjA4NTQ2NDU4M30.VaXPEqOOaXxsBcuRiieAcQ8u_6AVhRXD0qJOVrN891o';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let habits = [];
-        let history = JSON.parse(localStorage.getItem('saiyan-history')) || {};
+        let history = {};
         let weeklyChart, monthlyChart;
 
         const transformations = {
@@ -362,10 +472,45 @@
             ssj5: "img/goku-ssj5.png"
         };
 
+        // --- AUTH LOGIC ---
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorElement = document.getElementById('login-error');
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                errorElement.innerText = "Error: El Ki no coincide o usuario no existe.";
+                errorElement.style.display = "block";
+            } else {
+                errorElement.style.display = "none";
+                checkSession();
+            }
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            location.reload();
+        }
+
+        async function checkSession() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+
+            if (session) {
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'flex';
+                loadData();
+            } else {
+                document.getElementById('login-overlay').style.display = 'flex';
+                document.getElementById('main-content').style.display = 'none';
+            }
+        }
+
+        // --- DATA LOGIC ---
         async function loadData() {
             try {
-                // Cargar Hábitos
-                const { data: dbHabits, error: hError } = await supabase
+                const { data: dbHabits, error: hError } = await supabaseClient
                     .from('saiyan_habits')
                     .select('*')
                     .order('id', { ascending: true });
@@ -373,14 +518,12 @@
                 if (hError) throw hError;
                 habits = dbHabits;
 
-                // Cargar Historial
-                const { data: dbHistory, error: histError } = await supabase
+                const { data: dbHistory, error: histError } = await supabaseClient
                     .from('saiyan_history')
                     .select('*');
 
                 if (histError) throw histError;
 
-                // Convertir array a objeto para compatibilidad
                 history = {};
                 dbHistory.forEach(row => {
                     history[row.date] = row.progress;
@@ -393,13 +536,8 @@
                 document.getElementById('sync-status').innerText = "(Error de Ki)";
                 document.getElementById('sync-status').style.color = "#ff0000";
 
-                // Fallback a localStorage si falla la red
                 habits = JSON.parse(localStorage.getItem('saiyan-habits')) || [
-                    { id: 1, text: "Entrenamiento de Gravedad", done: false },
-                    { id: 2, text: "Dieta Hiperproteica", done: false },
-                    { id: 3, text: "Control de Ki (Meditación)", done: false },
-                    { id: 4, text: "Descanso en Cápsula", done: false },
-                    { id: 5, text: "Superar tus Límites", done: false }
+                    { id: 1, text: "Habit Placeholder", done: false }
                 ];
             }
             updateUI();
@@ -407,7 +545,6 @@
         }
 
         async function saveState(habitId = null) {
-            // Guardar localmente siempre como backup inmediato
             localStorage.setItem('saiyan-habits', JSON.stringify(habits));
 
             const today = new Date().toISOString().split('T')[0];
@@ -417,22 +554,19 @@
             history[today] = progress;
             localStorage.setItem('saiyan-history', JSON.stringify(history));
 
-            // Sincronizar con Supabase
             try {
                 document.getElementById('sync-status').innerText = "(Sincronizando...)";
                 document.getElementById('sync-status').style.color = "var(--ssj-gold)";
 
-                // Si se pasó un habitId, actualizar solo ese hábito en DB
                 if (habitId !== null) {
                     const habit = habits.find(h => h.id === habitId);
-                    await supabase
+                    await supabaseClient
                         .from('saiyan_habits')
                         .update({ done: habit.done })
                         .eq('id', habitId);
                 }
 
-                // Guardar/Actualizar progreso diario
-                await supabase
+                await supabaseClient
                     .from('saiyan_history')
                     .upsert({ date: today, progress: progress });
 
@@ -627,8 +761,15 @@
             });
         }
 
-        loadData();
-    </script>
+        // --- SESSION INIT ---
+        checkSession();
+
+        // Escuchar cambios de autenticación
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+                checkSession();
+            }
+        });
     </script>
 </body>
 
