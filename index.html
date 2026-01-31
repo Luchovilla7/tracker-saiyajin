@@ -189,6 +189,83 @@
             color: #888;
         }
 
+        /* Habit Management Styles */
+        .add-habit-container {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .add-habit-input {
+            flex-grow: 1;
+            padding: 12px;
+            background: #111;
+            border: 1px solid var(--dbz-orange);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .btn-add {
+            padding: 10px 20px;
+            background: var(--dbz-orange);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Bangers';
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-add:hover {
+            transform: scale(1.05);
+            background: #ffaa33;
+        }
+
+        .habit-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .habit-item:hover .habit-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px;
+            border-radius: 4px;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-btn {
+            color: var(--ssj-gold);
+        }
+
+        .edit-btn:hover {
+            background: rgba(255, 204, 0, 0.2);
+        }
+
+        .delete-btn {
+            color: #ff4444;
+        }
+
+        .delete-btn:hover {
+            background: rgba(255, 68, 68, 0.2);
+        }
+
         /* Login Screen Styles */
         #login-overlay {
             position: fixed;
@@ -409,6 +486,12 @@
             <div id="ki-fill"></div>
         </div>
 
+        <div class="add-habit-container">
+            <input type="text" id="new-habit-text" class="add-habit-input" placeholder="Nuevo entrenamiento..."
+                onkeypress="if(event.key === 'Enter') addHabit()">
+            <button class="btn-add" onclick="addHabit()">AÑADIR</button>
+        </div>
+
         <ul class="habit-list" id="habit-list">
             <!-- Generado por JS -->
         </ul>
@@ -580,6 +663,68 @@
             updateAnalytics();
         }
 
+        async function addHabit() {
+            const input = document.getElementById('new-habit-text');
+            const text = input.value.trim();
+            if (!text) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('saiyan_habits')
+                    .insert([{ text: text, done: false }])
+                    .select();
+
+                if (error) throw error;
+
+                habits.push(data[0]);
+                input.value = '';
+                updateUI();
+                saveState(); // Update history progress
+            } catch (error) {
+                console.error("Error al añadir hábito:", error);
+                alert("Error al acceder a la Cámara del Tiempo (DB)");
+            }
+        }
+
+        async function editHabit(id, currentText) {
+            const newText = prompt("Edita tu entrenamiento:", currentText);
+            if (newText === null || newText.trim() === "" || newText === currentText) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('saiyan_habits')
+                    .update({ text: newText.trim() })
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                const habit = habits.find(h => h.id === id);
+                if (habit) habit.text = newText.trim();
+                updateUI();
+            } catch (error) {
+                console.error("Error al editar hábito:", error);
+            }
+        }
+
+        async function deleteHabit(id) {
+            if (!confirm("¿Eliminar este entrenamiento? La fuerza del Guerrero podría disminuir...")) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('saiyan_habits')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                habits = habits.filter(h => h.id !== id);
+                updateUI();
+                saveState(); // Update history progress
+            } catch (error) {
+                console.error("Error al eliminar hábito:", error);
+            }
+        }
+
         function getSaiyanRank(avgProgress) {
             if (avgProgress >= 90) return "Dios Destructor";
             if (avgProgress >= 70) return "Guerrero Élite";
@@ -746,6 +891,10 @@
                 li.innerHTML = `
                     <div class="checkbox">${habit.done ? '✓' : ''}</div>
                     <span class="habit-text">${habit.text}</span>
+                    <div class="habit-actions">
+                        <button class="action-btn edit-btn" onclick="event.stopPropagation(); editHabit(${habit.id}, '${habit.text}')" title="Editar">✎</button>
+                        <button class="action-btn delete-btn" onclick="event.stopPropagation(); deleteHabit(${habit.id})" title="Eliminar">🗑</button>
+                    </div>
                 `;
                 li.onclick = () => {
                     habit.done = !habit.done;
